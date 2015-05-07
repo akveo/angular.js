@@ -2127,9 +2127,11 @@ describe('$compile', function() {
       describe('scope', function() {
         var iscope;
 
-        beforeEach(module(function() {
-          forEach(['', 'a', 'b'], function(name) {
-            directive('scope' + uppercase(name), function(log) {
+        var fakeScopeMdl = angular.module('fakeScopeMdl', []);
+
+        forEach(['', 'a', 'b'], function(name) {
+          fakeScopeMdl
+            .directive('scope' + uppercase(name), function(log) {
               return {
                 scope: true,
                 restrict: 'CA',
@@ -2140,8 +2142,8 @@ describe('$compile', function() {
                   }};
                 }
               };
-            });
-            directive('iscope' + uppercase(name), function(log) {
+            })
+            .directive('iscope' + uppercase(name), function(log) {
               return {
                 scope: {},
                 restrict: 'CA',
@@ -2153,8 +2155,8 @@ describe('$compile', function() {
                   };
                 }
               };
-            });
-            directive('tscope' + uppercase(name), function(log) {
+            })
+            .directive('tscope' + uppercase(name), function(log) {
               return {
                 scope: true,
                 restrict: 'CA',
@@ -2166,8 +2168,8 @@ describe('$compile', function() {
                   };
                 }
               };
-            });
-            directive('stscope' + uppercase(name), function(log) {
+            })
+            .directive('stscope' + uppercase(name), function(log) {
               return {
                 scope: true,
                 restrict: 'CA',
@@ -2179,8 +2181,8 @@ describe('$compile', function() {
                   };
                 }
               };
-            });
-            directive('trscope' + uppercase(name), function(log) {
+            })
+            .directive('trscope' + uppercase(name), function(log) {
               return {
                 scope: true,
                 replace: true,
@@ -2193,8 +2195,8 @@ describe('$compile', function() {
                   };
                 }
               };
-            });
-            directive('tiscope' + uppercase(name), function(log) {
+            })
+            .directive('tiscope' + uppercase(name), function(log) {
               return {
                 scope: {},
                 restrict: 'CA',
@@ -2207,8 +2209,8 @@ describe('$compile', function() {
                   };
                 }
               };
-            });
-            directive('stiscope' + uppercase(name), function(log) {
+            })
+            .directive('stiscope' + uppercase(name), function(log) {
               return {
                 scope: {},
                 restrict: 'CA',
@@ -2222,8 +2224,10 @@ describe('$compile', function() {
                 }
               };
             });
-          });
-          directive('log', function(log) {
+        });
+
+        fakeScopeMdl
+          .directive('log', function(log) {
             return {
               restrict: 'CA',
               link: {pre: function(scope) {
@@ -2231,8 +2235,8 @@ describe('$compile', function() {
               }}
             };
           });
-        }));
 
+        beforeEach(module('fakeScopeMdl'));
 
         it('should allow creation of new scopes', inject(function($rootScope, $compile, log) {
           element = $compile('<div><span scope><a log></a></span></div>')($rootScope);
@@ -2335,7 +2339,7 @@ describe('$compile', function() {
           function($rootScope, $compile) {
             expect(function() {
               $compile('<div class="iscope-a; scope-b"></div>');
-            }).toThrowMinErr('$compile', 'multidir', 'Multiple directives [iscopeA, scopeB] asking for new/isolated scope on: ' +
+            }).toThrowMinErr('$compile', 'multidir', 'Multiple directives [iscopeA (module: fakeScopeMdl), scopeB (module: fakeScopeMdl)] asking for new/isolated scope on: ' +
                 '<div class="iscope-a; scope-b">');
           })
         );
@@ -2354,7 +2358,7 @@ describe('$compile', function() {
           inject(function($compile) {
             expect(function() {
               $compile('<div class="iscope-a; high-priority-scope"></div>');
-            }).toThrowMinErr('$compile', 'multidir', 'Multiple directives [highPriorityScope, iscopeA] asking for new/isolated scope on: ' +
+            }).toThrowMinErr('$compile', 'multidir', 'Multiple directives [highPriorityScope, iscopeA (module: fakeScopeMdl)] asking for new/isolated scope on: ' +
                     '<div class="iscope-a; high-priority-scope">');
           });
         });

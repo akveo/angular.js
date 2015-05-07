@@ -620,6 +620,7 @@ function createInjector(modulesToLoad, strictDi) {
       providerSuffix = 'Provider',
       path = [],
       loadedModules = new HashMap([], true),
+      namedModulesLoaded = [],
       providerCache = {
         $provide: {
             provider: supportObject(provider),
@@ -735,6 +736,7 @@ function createInjector(modulesToLoad, strictDi) {
 
       try {
         if (isString(module)) {
+          namedModulesLoaded.push(module);
           moduleFn = angularModule(module);
           runBlocks = runBlocks.concat(loadModules(moduleFn.requires)).concat(moduleFn._runBlocks);
           runInvokeQueue(moduleFn._invokeQueue);
@@ -843,7 +845,8 @@ function createInjector(modulesToLoad, strictDi) {
       annotate: createInjector.$$annotate,
       has: function(name) {
         return providerCache.hasOwnProperty(name + providerSuffix) || cache.hasOwnProperty(name);
-      }
+      },
+      _namedModulesLoaded: namedModulesLoaded
     };
   }
 }

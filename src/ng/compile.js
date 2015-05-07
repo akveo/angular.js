@@ -852,6 +852,7 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
                 if (isObject(bindings.isolateScope)) {
                   directive.$$isolateBindings = bindings.isolateScope;
                 }
+                directive._factory = directiveFactory;
                 directives.push(directive);
               } catch (e) {
                 $exceptionHandler(e);
@@ -2300,11 +2301,35 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
       return a.index - b.index;
     }
 
+    function getModuleNameByDirectiveName(directive) {
+      var moduleName = '';
+
+      forEach($injector._namedModulesLoaded, function(loadedModuleName) {
+        var loadedModule = angularModule(loadedModuleName);
+        forEach(loadedModule._invokeQueue, function(invokeItem) {
+          var invocationParams = invokeItem[2];
+          if (invokeItem[1] == 'directive' &&
+            invocationParams['0'] === directive.name &&
+            invocationParams['1'] === directive._factory) {
+            moduleName = loadedModule.name;
+          }
+        });
+      });
+      return moduleName;
+    }
 
     function assertNoDuplicate(what, previousDirective, directive, element) {
+
+      function wrapModuleNameIfDefined(moduleName) {
+        return moduleName ?
+          (' (module: ' + moduleName + ')') :
+          '';
+      }
+
       if (previousDirective) {
-        throw $compileMinErr('multidir', 'Multiple directives [{0}, {1}] asking for {2} on: {3}',
-            previousDirective.name, directive.name, what, startingTag(element));
+        throw $compileMinErr('multidir', 'Multiple directives [{0}{1}, {2}{3}] asking for {4} on: {5}',
+            previousDirective.name, wrapModuleNameIfDefined(getModuleNameByDirectiveName(previousDirective)),
+            directive.name, wrapModuleNameIfDefined(getModuleNameByDirectiveName(directive)), what, startingTag(element));
       }
     }
 
