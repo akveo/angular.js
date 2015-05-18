@@ -846,7 +846,7 @@ function createInjector(modulesToLoad, strictDi) {
       has: function(name) {
         return providerCache.hasOwnProperty(name + providerSuffix) || cache.hasOwnProperty(name);
       },
-      _namedModulesLoaded: namedModulesLoaded
+      $$namedModulesLoaded: namedModulesLoaded
     };
   }
 }

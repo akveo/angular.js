@@ -2304,7 +2304,7 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
     function getModuleNameByDirectiveName(directive) {
       var moduleName = '';
 
-      forEach($injector._namedModulesLoaded, function(loadedModuleName) {
+      forEach($injector.$$namedModulesLoaded, function(loadedModuleName) {
         var loadedModule = angularModule(loadedModuleName);
         forEach(loadedModule._invokeQueue, function(invokeItem) {
           var invocationParams = invokeItem[2];
