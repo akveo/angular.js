@@ -280,7 +280,7 @@ function setupModuleLoader(window) {
            * @description
            * See {@link ng.$compileProvider#directive $compileProvider.directive()}.
            */
-          directive: invokeLater('$compileProvider', 'directive'),
+          directive: directiveInvokeLater,
 
           /**
            * @ngdoc method
@@ -329,6 +329,18 @@ function setupModuleLoader(window) {
             queue[insertMethod || 'push']([provider, method, arguments]);
             return moduleInstance;
           };
+        }
+
+        /**
+         * Special case of invokeLater for directive
+         * @param {string} directiveName
+         * @param {function} factory
+         * @returns {angular.Module}
+         */
+        function directiveInvokeLater(directiveName, factory) {
+          if (factory && isFunction(factory)) factory.$$moduleName = name;
+          invokeQueue.push(['$compileProvider', 'directive', arguments]);
+          return moduleInstance;
         }
       });
     };
